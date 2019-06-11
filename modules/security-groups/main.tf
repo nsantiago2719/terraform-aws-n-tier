@@ -1,3 +1,10 @@
+#---------------------------------------------------------------------------------------
+# Terraform version should be used by this template
+#---------------------------------------------------------------------------------------
+terraform {
+  required_version = "0.12.1"
+}
+
 resource "aws_security_group" "security-group" {
   name = "${var.name}-group"
   description = "${var.description}"

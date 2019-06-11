@@ -1,3 +1,10 @@
+#---------------------------------------------------------------------------------------
+# Terraform version should be used by this template
+#---------------------------------------------------------------------------------------
+terraform {
+  required_version = "0.12.1"
+}
+
 resource "aws_vpc" "vpc" {
 
   cidr_block = "${var.vpc-cidr-block}"
@@ -15,7 +22,6 @@ module "public_subnet" {
   vpc-id                     = "${aws_vpc.vpc.id}"
   cidr-block                 = ["10.0.1.0/24", "10.0.5.0/24", "10.0.10.0/24"]
   public                     = true
-  subnet-counts              = 3
   aws-default-route-table-id = "${aws_vpc.vpc.default_route_table_id}"
 }
 
@@ -27,8 +33,6 @@ module "private_subnet" {
   vpc-id                     = "${aws_vpc.vpc.id}"
   cidr-block                 = ["10.0.21.0/24", "10.0.25.0/24", "10.0.30.0/24"]
   public                     = false
-  subnet-counts              = 3
-  aws-default-route-table-id = "${aws_vpc.vpc.default_route_table_id}"
 }
 
 module "nat-gateway" {

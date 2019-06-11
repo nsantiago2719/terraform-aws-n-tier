@@ -1,3 +1,15 @@
+#---------------------------------------------------------------------------------------
+# This a template file containing all resources within the modules and uses them to 
+# create the needed resources.
+#---------------------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------------------
+# Terraform version should be used by this template
+#---------------------------------------------------------------------------------------
+terraform {
+  required_version = "0.12.1"
+}
+
 provider "aws" {
   region = "us-east-1"
   shared_credentials_file = "~/.aws/credentials"

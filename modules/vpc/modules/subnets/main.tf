@@ -1,7 +1,14 @@
+#---------------------------------------------------------------------------------------
+# Terraform version should be used by this template
+#---------------------------------------------------------------------------------------
+terraform {
+  required_version = "0.12.1"
+}
+
 data "aws_availability_zones" "available" {}
 
 resource "aws_subnet" "subnets" {
-  count = "${var.subnet-counts}"
+  count = "${length(var.cidr-block)}"
 
   cidr_block = "${element(var.cidr-block, count.index)}"
   vpc_id     = "${var.vpc-id}"

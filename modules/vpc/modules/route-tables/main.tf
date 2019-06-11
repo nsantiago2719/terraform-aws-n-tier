@@ -1,3 +1,10 @@
+#---------------------------------------------------------------------------------------
+# Terraform version should be used by this template
+#---------------------------------------------------------------------------------------
+terraform {
+  required_version = "0.12.1"
+}
+
 resource "aws_route_table" "route-table" {
   vpc_id = "${var.vpc-id}"
 

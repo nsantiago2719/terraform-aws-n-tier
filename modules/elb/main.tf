@@ -1,3 +1,10 @@
+#---------------------------------------------------------------------------------------
+# Terraform version should be used by this template
+#---------------------------------------------------------------------------------------
+terraform {
+  required_version = "0.12.1"
+}
+
 data "aws_availability_zones" "available" {}
 resource "aws_lb" "elb" {
   name = "${var.name}"

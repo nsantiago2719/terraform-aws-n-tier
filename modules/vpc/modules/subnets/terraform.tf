@@ -23,15 +23,10 @@ variable "public" {
   description = "Determines if the subnet to be created will be public or private"
 }
 
-variable "subnet-counts" {
-  type = number
-  description = "Number of subnets created. This should align on how many available AZ on the region you chose"
-  default = 1
-}
-
 variable "aws-default-route-table-id" {
   type = "string"
   description = "Default route table id generated. Required if public is true"
+  default = ""
 }
 
 variable "public-subnet-id" {
