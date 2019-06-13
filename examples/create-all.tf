@@ -1,18 +1,70 @@
+#---------------------------------------------------------------------------------------
+# This a template file containing all resources within the modules and uses them to
+# create the needed resources.
+#---------------------------------------------------------------------------------------
+
+#---------------------------------------------------------------------------------------
+# Terraform version should be used by this template
+#---------------------------------------------------------------------------------------
+terraform {
+  required_version = "0.12.1"
+}
+
+#---------------------------------------------------------------------------------------
+# The cloud provider configuration. In this case we are using AWS. The default region
+# is 'us-east-1'. See https://docs.aws.amazon.com/general/latest/gr/rande.html for more
+# regions.
+#
+# shared_credentials_file contains your access_key and secret_key provided by AWS
+#---------------------------------------------------------------------------------------
+
 provider "aws" {
   region = "us-east-1"
   shared_credentials_file = "~/.aws/credentials"
 }
+
+
+#---------------------------------------------------------------------------------------
+# Key pairs uploaded in AWS and will be used by the instances for SSH connections
+#---------------------------------------------------------------------------------------
 
 resource "aws_key_pair" "key-pair" {
   key_name   = "simple-key-pair"
   public_key = "${file("${path.cwd}/keypair")}"
 }
 
-
+#---------------------------------------------------------------------------------------
+# Simple template of VPC that'll be created for the project.
+# Parameters:
+#
+# vpc-cidr-block      = CIDR block for the VPC. Default 10.0.0.0/16 (optional)
+# project             = Project name of the VPC. Default simple-project (optional)
+# public-subnet-cidr  = CIDR block for public subnets. Default ["10.0.1.0/24",
+                                                                "10.0.5.0/24",
+                                                                "10.0.10.0/24"] (optional)
+#
+# private-subnet-cidr = CIDR block for private subnets. Default ["10.0.21.0/24",
+                                                                 "10.0.25.0/24",
+                                                                 "10.0.30.0/24"] (optional)
+#---------------------------------------------------------------------------------------
 module "project-vpc" {
   source = "./modules/vpc"
 }
 
+#---------------------------------------------------------------------------------------
+# Security groups that is publicly and privately accessible.
+# security-group-public open port 80 and 443 to 0.0.0.0/0.
+# security-group-instances open port 80 to security-group-public.
+#
+# Parameters:
+#
+# name          = Name to be provided for the security group. Required
+# description   = Description for the security group. (optional)
+# vpc-id        = VPC where the security group is attached. Required
+# ingress-ports = List of ingress ports to be allowed in the public group. Default ["80"]
+# allowed-cidr-block = List of CIDR block allowed on the security group. Default []
+# security-group-ids = List of Security Group ids allowed on the security group. Default []
+#---------------------------------------------------------------------------------------
 module "security-group-public" {
   source = "./modules/security-groups"
 
@@ -33,7 +85,20 @@ module "security-group-instance" {
   security-group-ids = ["${module.security-group-public.id}"]
 }
 
-module "instances" {
+#---------------------------------------------------------------------------------------
+# Instance cluster deployed in private subnet. It is also possible to create publicly
+# accessible instances by changing the subnet and subnets being used by the instance.
+# Instances created through this template has a t2.micro instance type.
+#
+# Parameters:
+# subnet-ids = List of subnets that is going to be use by the instance. Required
+# project    = Project where the instance belong. Default simple-project. Optional
+# key-pair   = Allowed public key pair name to be assigned on the instance. Required
+# user-data  = User data in string to be executed upon initializing the instance. Optional
+# desired-instance = Desired instance to be deployed across the given subnets. Default 3
+# security-group-ids = list of security group ids to be attached to the intances. Required
+#---------------------------------------------------------------------------------------
+module "instance-cluster-private" {
   source = "./modules/ec2"
 
   desired-instance = 3
@@ -45,6 +110,19 @@ module "instances" {
   user-data = "${file("${path.cwd}/modules/install_nginx/install")}"
 }
 
+#---------------------------------------------------------------------------------------
+# Internet facing Application Load Balancer for the intances that is created in the private subnet.
+# Routes port 443 to port 80 of the instances.
+#
+# Parameters:
+# name = Name for the ALB. Required
+# instances-ids = Instance ids to be attached on the load balancers target group. Required
+# subnets = Subnets where the load balancer is deployed. Required
+# security-groups = List of security group for the load balancer. Required
+# vpc-id = VPC for the load balancer. Required
+# certificate-arn = Certificate arn for the load balancer. Requried. 
+#                   Note: ACM requires validated domain to issue SSL certificate.
+#---------------------------------------------------------------------------------------
 module "elb" {
   source = "./modules/elb"
 
