@@ -1,7 +1,6 @@
 package test
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -9,24 +8,23 @@ import (
 	"github.com/gruntwork-io/terratest/modules/terraform"
 )
 
-func TestCreateAll(t *testing.T) {
+func TestCreateEc2(t *testing.T) {
 
 	terraformOptions := &terraform.Options{
-		TerraformDir: "../examples/create-all",
-		Vars: map[string]interface{}{
-			"certificate-arn": os.Getenv("CERTIFICATE_ARN"),
-		},
+		TerraformDir: "../examples/ec2-test",
+		Vars:         map[string]interface{}{},
 	}
+
 	defer terraform.Destroy(t, terraformOptions)
 
 	terraform.InitAndApply(t, terraformOptions)
 
-	elbUrl := terraform.Output(t, terraformOptions, "elb_dns")
+	instanceURL := terraform.Output(t, terraformOptions, "instance-ip")
 
 	maxRetries := 30
 	timeBetweenRetries := 5 * time.Second
 
 	instanceText := "Welcome to nginx on Amazon Linux"
 
-	http_helper.HttpGetWithRetry(t, elbUrl, 200, instanceText, maxRetries, timeBetweenRetries)
+	http_helper.HttpGetWithRetry(t, instanceURL, 200, instanceText, maxRetries, timeBetweenRetries)
 }
