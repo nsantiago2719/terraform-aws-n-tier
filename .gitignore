@@ -3,3 +3,4 @@
 terraform.tfstate*
 keypair
 terraform.tfvars
+test/vendor
