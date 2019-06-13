@@ -10,17 +10,43 @@ terraform {
   required_version = "0.12.1"
 }
 
+#---------------------------------------------------------------------------------------
+# The cloud provider configuration. In this case we are using AWS. The default region
+# is 'us-east-1'. See https://docs.aws.amazon.com/general/latest/gr/rande.html for more
+# regions.
+#
+# shared_credentials_file contains your access_key and secret_key provided by AWS
+#---------------------------------------------------------------------------------------
+
 provider "aws" {
   region = "us-east-1"
   shared_credentials_file = "~/.aws/credentials"
 }
+
+
+#---------------------------------------------------------------------------------------
+# Key pairs uploaded in AWS and will be used by the instances for SSH connections
+#---------------------------------------------------------------------------------------
 
 resource "aws_key_pair" "key-pair" {
   key_name   = "simple-key-pair"
   public_key = "${file("${path.cwd}/keypair")}"
 }
 
-
+#---------------------------------------------------------------------------------------
+# Simple template of VPC that'll be created for the project.
+# Parameters:
+#
+# vpc-cidr-block      = CIDR block for the VPC. Default 10.0.0.0/16 (optional)
+# project             = Project name of the VPC. Default simple-project (optional)
+# public-subnet-cidr  = CIDR block for public subnets. Default ["10.0.1.0/24",
+                                                                "10.0.5.0/24",
+                                                                "10.0.10.0/24"] (optional)
+#
+# private-subnet-cidr = CIDR block for private subnets. Default ["10.0.21.0/24",
+                                                                 "10.0.25.0/24",
+                                                                 "10.0.30.0/24"] (optional)
+#---------------------------------------------------------------------------------------
 module "project-vpc" {
   source = "./modules/vpc"
 }
@@ -45,7 +71,7 @@ module "security-group-instance" {
   security-group-ids = ["${module.security-group-public.id}"]
 }
 
-module "instances" {
+module "instance-cluster-private" {
   source = "./modules/ec2"
 
   desired-instance = 3

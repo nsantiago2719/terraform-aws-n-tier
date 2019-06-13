@@ -10,8 +10,15 @@ variable "project" {
   default = "simple-project"
 }
 
-variable "environment" {
-  type = "string"
-  description = "Specific workspace where the VPC is created"
-  default = "development"
+variable "public-subnet-cidr" {
+  type = "list"
+  description = "CIDR block for public subnets"
+  default = ["10.0.1.0/24", "10.0.5.0/24", "10.0.10.0/24"]
 }
+
+variable "private-subnet-cidr" {
+  type = "list"
+  description = "CIDR block for private subnets"
+  default = ["10.0.21.0/24", "10.0.25.0/24", "10.0.30.0/24"]
+}
+

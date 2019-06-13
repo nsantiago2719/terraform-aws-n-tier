@@ -20,7 +20,7 @@ module "public_subnet" {
   project                    = "simple-project"
   name                       = "public-subnet"
   vpc-id                     = "${aws_vpc.vpc.id}"
-  cidr-block                 = ["10.0.1.0/24", "10.0.5.0/24", "10.0.10.0/24"]
+  cidr-block                 = "${var.public-subnet-cidr}"
   public                     = true
   aws-default-route-table-id = "${aws_vpc.vpc.default_route_table_id}"
 }
@@ -31,7 +31,7 @@ module "private_subnet" {
   project                    = "simple-project"
   name                       = "private-subnet"
   vpc-id                     = "${aws_vpc.vpc.id}"
-  cidr-block                 = ["10.0.21.0/24", "10.0.25.0/24", "10.0.30.0/24"]
+  cidr-block                 = "${var.private-subnet-cidr}"
   public                     = false
 }
 
