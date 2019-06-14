@@ -23,7 +23,3 @@ variable "vpc-id" {
   description = "VPC for the load balancer"
 }
 
-variable "certificate-arn" {
-  type = "string"
-  description = "Certificate ARN for the load balancer"
-}

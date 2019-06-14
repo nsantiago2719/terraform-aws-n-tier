@@ -152,6 +152,45 @@ module "application-load-balancer" {
   subnets         = "${module.project-vpc.public-subnet-ids}"
   security-groups = ["${module.security-group-public.id}"]
   vpc-id          = "${module.project-vpc.vpc-id}"
-  certificate-arn = "${var.certificate-arn}"
+}
+
+# ---------------------------------------------------------------------------------------
+# Adds subdomain record for the to connect on Application Load Balancer
+#
+# Parameters:
+# subdomain        = Sub-domain A record to be created. Required
+# hosted-zone-name = Hosted zone name for the subdomain. Required
+# lb-dns           = DNS of the load balancers to be attached on the created A Record. Required
+# lb-zone-id       = Hosted zone used by the load balancer. Required
+# ---------------------------------------------------------------------------------------
+module "subdomain-record" {
+  source = "./modules/domain-routes"
+
+  subdomain        = "${var.sub-domain}"
+  hosted-zone-name = "${var.hosted-zone-name}"
+  lb-dns           = "${module.application-load-balancer.dns}"
+  lb-zone-id       = "${module.application-load-balancer.zone-id}"
+}
+
+# ---------------------------------------------------------------------------------------
+# Creates ACM Certificate for the subdomain and attached a listener to the 
+# load balancer created.
+#
+# Parameters:
+# 
+# domain            = Domain name for the architecture. Required
+# hosted-zone-name  = Hosted zone name for ACM Verification. Required
+# alternative-names = Alternative domain names for the SSL Certificate
+# elb-arn           = Load balancer arn where to attach the certificate
+# target-group-arn  = Target group arn for the listener
+# ---------------------------------------------------------------------------------------
+module "https-connection" {
+  source = "./modules/acm-ssl"
+
+  domain            = "${var.domain-name}"
+  hosted-zone-name  = "${var.hosted-zone-name}"
+  alternative-names = ["*.${var.domain-name}"]
+  elb-arn           = "${module.application-load-balancer.arn}"
+  target-group-arn  = "${module.application-load-balancer.target-group-arn}" 
 }
 

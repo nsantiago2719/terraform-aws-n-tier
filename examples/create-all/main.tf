@@ -64,7 +64,7 @@ module "project-vpc" {
   source = "./modules/vpc"
 }
 
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 #
 # Security groups that is publicly and privately accessible.
 # security-group-public open port 80 and 443 to 0.0.0.0/0.
@@ -81,7 +81,7 @@ module "project-vpc" {
 # security-group-ids = List of Security Group ids allowed on the security group. Default []
 #                      Required if allowed-cidr-block is [].
 #
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 module "security-group-public" {
   source = "./modules/security-groups"
 
@@ -102,7 +102,7 @@ module "security-group-instance" {
   security-group-ids = ["${module.security-group-public.id}"]
 }
 
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 #
 # Instance cluster deployed in private subnet. It is also possible to create publicly
 # accessible instances by changing the subnet and subnets being used by the instance.
@@ -116,7 +116,7 @@ module "security-group-instance" {
 # desired-instance   = Desired instance to be deployed across the given subnets. Default 3
 # security-group-ids = list of security group ids to be attached to the intances. Required
 #
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 module "instance-cluster-private" {
   source = "./modules/ec2"
 
@@ -128,7 +128,7 @@ module "instance-cluster-private" {
   user-data          = "${file("${path.cwd}/modules/install_nginx/install")}"
 }
 
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 #
 # Internet facing Application Load Balancer for the intances that is created in the private subnet.
 # Routes port 443 to port 80 of the instances.
@@ -142,7 +142,7 @@ module "instance-cluster-private" {
 # certificate-arn = Certificate arn for the load balancer. Requried. 
 #                   Note: ACM requires validated domain to issue SSL certificate.
 #
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 
 module "application-load-balancer" {
   source = "./modules/elb"
@@ -152,6 +152,45 @@ module "application-load-balancer" {
   subnets         = "${module.project-vpc.public-subnet-ids}"
   security-groups = ["${module.security-group-public.id}"]
   vpc-id          = "${module.project-vpc.vpc-id}"
-  certificate-arn = "${var.certificate-arn}"
+}
+
+# ---------------------------------------------------------------------------------------
+# Adds subdomain record for the to connect on Application Load Balancer
+#
+# Parameters:
+# subdomain        = Sub-domain A record to be created. Required
+# hosted-zone-name = Hosted zone name for the subdomain. Required
+# lb-dns           = DNS of the load balancers to be attached on the created A Record. Required
+# lb-zone-id       = Hosted zone used by the load balancer. Required
+# ---------------------------------------------------------------------------------------
+module "subdomain-record" {
+  source = "./modules/domain-routes"
+
+  subdomain        = "${var.sub-domain}"
+  hosted-zone-name = "${var.hosted-zone-name}"
+  lb-dns           = "${module.application-load-balancer.dns}"
+  lb-zone-id       = "${module.application-load-balancer.zone-id}"
+}
+
+# ---------------------------------------------------------------------------------------
+# Creates ACM Certificate for the subdomain and attached a listener to the 
+# load balancer created.
+#
+# Parameters:
+# 
+# domain            = Domain name for the architecture. Required
+# hosted-zone-name  = Hosted zone name for ACM Verification. Required
+# alternative-names = Alternative domain names for the SSL Certificate
+# elb-arn           = Load balancer arn where to attach the certificate
+# target-group-arn  = Target group arn for the listener
+# ---------------------------------------------------------------------------------------
+module "https-connection" {
+  source = "./modules/acm-ssl"
+
+  domain            = "${var.domain-name}"
+  hosted-zone-name  = "${var.hosted-zone-name}"
+  alternative-names = ["*.${var.domain-name}"]
+  elb-arn           = "${module.application-load-balancer.arn}"
+  target-group-arn  = "${module.application-load-balancer.target-group-arn}" 
 }
 
