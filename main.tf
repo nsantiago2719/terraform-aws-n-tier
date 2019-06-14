@@ -64,7 +64,7 @@ module "project-vpc" {
   source = "./modules/vpc"
 }
 
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 #
 # Security groups that is publicly and privately accessible.
 # security-group-public open port 80 and 443 to 0.0.0.0/0.
@@ -81,7 +81,7 @@ module "project-vpc" {
 # security-group-ids = List of Security Group ids allowed on the security group. Default []
 #                      Required if allowed-cidr-block is [].
 #
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 module "security-group-public" {
   source = "./modules/security-groups"
 
@@ -102,7 +102,7 @@ module "security-group-instance" {
   security-group-ids = ["${module.security-group-public.id}"]
 }
 
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 #
 # Instance cluster deployed in private subnet. It is also possible to create publicly
 # accessible instances by changing the subnet and subnets being used by the instance.
@@ -116,7 +116,7 @@ module "security-group-instance" {
 # desired-instance   = Desired instance to be deployed across the given subnets. Default 3
 # security-group-ids = list of security group ids to be attached to the intances. Required
 #
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 module "instance-cluster-private" {
   source = "./modules/ec2"
 
@@ -128,7 +128,7 @@ module "instance-cluster-private" {
   user-data          = "${file("${path.cwd}/modules/install_nginx/install")}"
 }
 
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 #
 # Internet facing Application Load Balancer for the intances that is created in the private subnet.
 # Routes port 443 to port 80 of the instances.
@@ -142,7 +142,7 @@ module "instance-cluster-private" {
 # certificate-arn = Certificate arn for the load balancer. Requried. 
 #                   Note: ACM requires validated domain to issue SSL certificate.
 #
-#---------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------
 
 module "application-load-balancer" {
   source = "./modules/elb"
