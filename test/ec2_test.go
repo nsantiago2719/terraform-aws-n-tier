@@ -19,7 +19,7 @@ func TestCreateEc2(t *testing.T) {
 
 	terraform.InitAndApply(t, terraformOptions)
 
-	instanceURL := terraform.Output(t, terraformOptions, "instance-ip")
+	instanceURL := terraform.Output(t, terraformOptions, "instance-url")
 
 	maxRetries := 30
 	timeBetweenRetries := 5 * time.Second
