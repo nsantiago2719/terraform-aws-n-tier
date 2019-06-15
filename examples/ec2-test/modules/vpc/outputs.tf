@@ -10,6 +10,3 @@ output "public-subnet-ids" {
   value = "${module.public_subnet.subnet-ids}"
 }
 
-output "private-subnet-ids" {
-  value = "${module.private_subnet.subnet-ids}"
-}

@@ -177,12 +177,12 @@ module "subdomain-record" {
 # load balancer created.
 #
 # Parameters:
-# 
+#
 # domain            = Domain name for the architecture. Required
 # hosted-zone-name  = Hosted zone name for ACM Verification. Required
-# alternative-names = Alternative domain names for the SSL Certificate
-# elb-arn           = Load balancer arn where to attach the certificate
-# target-group-arn  = Target group arn for the listener
+# alternative-names = Alternative domain names for the SSL Certificate. Optional
+# elb-arn           = Load balancer arn where to attach the certificate. Optional
+# target-group-arn  = Target group arn for the listener. Required if elb-arn is declared
 # ---------------------------------------------------------------------------------------
 module "https-connection" {
   source = "./modules/acm-ssl"
@@ -191,6 +191,6 @@ module "https-connection" {
   hosted-zone-name  = "${var.hosted-zone-name}"
   alternative-names = ["*.${var.domain-name}"]
   elb-arn           = "${module.application-load-balancer.arn}"
-  target-group-arn  = "${module.application-load-balancer.target-group-arn}" 
+  target-group-arn  = "${module.application-load-balancer.target-group-arn}"
 }
 

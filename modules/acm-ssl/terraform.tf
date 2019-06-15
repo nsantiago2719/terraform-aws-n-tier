@@ -11,6 +11,7 @@ variable "hosted-zone-name" {
 variable "alternative-names" {
   type = "list"
   description = "list of alternative names for the certificate"
+  default = []
 }
 
 variable "elb-arn" {

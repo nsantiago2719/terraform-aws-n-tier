@@ -38,6 +38,7 @@ resource "aws_acm_certificate_validation" "cert-verification" {
 }
 
 resource "aws_lb_listener" "listener" {
+  count = "${var.elb-arn ? 1 : 0}"
   load_balancer_arn = "${var.elb-arn}"
 
   port = 443

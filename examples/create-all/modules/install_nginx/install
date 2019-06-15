@@ -4,3 +4,4 @@ yum update -y
 amazon-linux-extras install -y nginx1.12
 systemctl start nginx
 systemctl enable nginx
+echo "Welcome to nginx on Amazon Linux" > /usr/share/nginx/html/index.html
