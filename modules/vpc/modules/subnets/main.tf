@@ -33,12 +33,12 @@ resource "aws_default_route_table" "default-route-table-association" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id    = "${aws_internet_gateway.igw[0].id}"
+    gateway_id = "${aws_internet_gateway.igw[0].id}"
   }
 }
 
 resource "aws_internet_gateway" "igw" {
-  count = "${var.public ? 1 : 0}"
+  count  = "${var.public ? 1 : 0}"
   vpc_id = "${var.vpc-id}"
 
   tags = {

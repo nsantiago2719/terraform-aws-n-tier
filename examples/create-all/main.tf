@@ -191,6 +191,6 @@ module "https-connection" {
   hosted-zone-name  = "${var.hosted-zone-name}"
   alternative-names = ["*.${var.domain-name}"]
   elb-arn           = "${module.application-load-balancer.arn}"
-  target-group-arn  = "${module.application-load-balancer.target-group-arn}" 
+  target-group-arn  = "${module.application-load-balancer.target-group-arn}"
 }
 

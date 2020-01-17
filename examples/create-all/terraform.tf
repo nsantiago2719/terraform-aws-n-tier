@@ -1,14 +1,14 @@
 variable "sub-domain" {
-  type = "string"
+  type        = "string"
   description = "Sub Domain name for the architecture"
 }
 
 variable "hosted-zone-name" {
-  type = "string"
+  type        = "string"
   description = "Hosted zone name of the architecture. eg. example.com."
 }
 
 variable "domain-name" {
-  type = "string"
+  type        = "string"
   description = "Domain name to be used"
 }

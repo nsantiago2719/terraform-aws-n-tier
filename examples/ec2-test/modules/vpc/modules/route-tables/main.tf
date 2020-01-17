@@ -9,8 +9,8 @@ resource "aws_route_table" "route-table" {
   vpc_id = "${var.vpc-id}"
 
   route {
-    cidr_block = "${var.cidr-block}"
-    nat_gateway_id = "${var.nat-gateway-id}"
+    cidr_block           = "${var.cidr-block}"
+    nat_gateway_id       = "${var.nat-gateway-id}"
     network_interface_id = "${var.network-interface-id}"
     instance_id          = "${var.instance-id}"
     gateway_id           = "${var.gateway-id}"

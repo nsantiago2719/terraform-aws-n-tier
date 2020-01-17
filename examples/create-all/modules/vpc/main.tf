@@ -10,12 +10,12 @@ resource "aws_vpc" "vpc" {
   cidr_block = "${var.vpc-cidr-block}"
 
   tags = {
-    Name        = "vpc-${var.project}"
+    Name = "vpc-${var.project}"
   }
 }
 
 module "public_subnet" {
-  source                     = "./modules/subnets"
+  source = "./modules/subnets"
 
   project                    = "simple-project"
   name                       = "public-subnet"
@@ -26,13 +26,13 @@ module "public_subnet" {
 }
 
 module "private_subnet" {
-  source                     = "./modules/subnets"
+  source = "./modules/subnets"
 
-  project                    = "simple-project"
-  name                       = "private-subnet"
-  vpc-id                     = "${aws_vpc.vpc.id}"
-  cidr-block                 = "${var.private-subnet-cidr}"
-  public                     = false
+  project    = "simple-project"
+  name       = "private-subnet"
+  vpc-id     = "${aws_vpc.vpc.id}"
+  cidr-block = "${var.private-subnet-cidr}"
+  public     = false
 }
 
 module "nat-gateway" {
@@ -41,7 +41,7 @@ module "nat-gateway" {
 }
 
 module "route-table-associations-private" {
-  source         = "./modules/route-tables"
+  source = "./modules/route-tables"
 
   subnets        = "${module.private_subnet.subnet-ids}"
   vpc-id         = "${aws_vpc.vpc.id}"

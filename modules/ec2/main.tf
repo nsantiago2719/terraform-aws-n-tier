@@ -12,8 +12,8 @@ terraform {
 resource "aws_instance" "instances" {
   count = "${var.desired-instance}"
 
-# NOTE: AMI and instance should be declared by the user. This should be updated rather
-# than using a variable for now.
+  # NOTE: AMI and instance should be declared by the user. This should be updated rather
+  # than using a variable for now.
   ami                    = "ami-0c6b1d09930fac512"
   instance_type          = "t2.micro"
   key_name               = "${var.key-pair}"

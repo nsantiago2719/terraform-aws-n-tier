@@ -10,12 +10,12 @@ resource "aws_vpc" "vpc" {
   cidr_block = "${var.vpc-cidr-block}"
 
   tags = {
-    Name        = "vpc-${var.project}"
+    Name = "vpc-${var.project}"
   }
 }
 
 module "public_subnet" {
-  source                     = "./modules/subnets"
+  source = "./modules/subnets"
 
   project                    = "simple-project"
   name                       = "public-subnet"

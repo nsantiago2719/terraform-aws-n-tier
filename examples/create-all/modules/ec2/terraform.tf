@@ -20,12 +20,12 @@ variable "user-data" {
 }
 
 variable "desired-instance" {
-  type = number
+  type        = number
   description = "desired instance to be deployed across the given subnets"
-  default = 3
+  default     = 3
 }
 
 variable "security-group-ids" {
-  type = "list"
+  type        = "list"
   description = "list of security group ids to be used in the instance"
 }

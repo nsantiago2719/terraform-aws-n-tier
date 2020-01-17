@@ -1,8 +1,4 @@
 #---------------------------------------------------------------------------------------
-# Terraform version should be used by this template
-#---------------------------------------------------------------------------------------
-
-#---------------------------------------------------------------------------------------
 # Note: This record expects that the hosted zone already existed.
 #---------------------------------------------------------------------------------------
 data "aws_route53_zone" "hosted-zone" {
@@ -35,16 +31,16 @@ resource "aws_acm_certificate_validation" "cert-verification" {
 }
 
 resource "aws_lb_listener" "listener" {
-  count = "${var.elb-arn ? 1 : 0}"
+  count             = "${var.elb-arn ? 1 : 0}"
   load_balancer_arn = "${var.elb-arn}"
 
-  port = 443
-  protocol = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "${aws_acm_certificate.cert.arn}"
+  port            = 443
+  protocol        = "HTTPS"
+  ssl_policy      = "ELBSecurityPolicy-2016-08"
+  certificate_arn = "${aws_acm_certificate.cert.arn}"
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = "${var.target-group-arn}"
   }
 }

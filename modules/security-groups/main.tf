@@ -10,7 +10,7 @@ terraform {
 }
 
 resource "aws_security_group" "security-group" {
-  name = "${var.name}-group"
+  name        = "${var.name}-group"
   description = "${var.description}"
   vpc_id      = "${var.vpc-id}"
 
@@ -18,10 +18,10 @@ resource "aws_security_group" "security-group" {
     for_each = var.ingress-ports
 
     content {
-      from_port   = ingress.value
-      to_port     = ingress.value
-      protocol    = "tcp"
-      cidr_blocks = "${var.allowed-cidr-block}"
+      from_port       = ingress.value
+      to_port         = ingress.value
+      protocol        = "tcp"
+      cidr_blocks     = "${var.allowed-cidr-block}"
       security_groups = "${var.security-group-ids}"
     }
   }

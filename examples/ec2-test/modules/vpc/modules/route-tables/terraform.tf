@@ -1,43 +1,43 @@
 variable "subnets" {
-  type = "list"
+  type        = "list"
   description = "list of subnets added to the route table association"
 }
 
 variable "vpc-id" {
-  type = "string"
+  type        = "string"
   description = "VPC Id assigned in the route table"
 }
 
 variable "project" {
-  type = "string"
+  type        = "string"
   description = "Project where the route table is under"
 }
 
 variable "cidr-block" {
-  type = "string"
+  type        = "string"
   description = "CIDR Block to be added on route table"
 }
 
 variable "nat-gateway-id" {
-  type = "string"
+  type        = "string"
   description = "NAT Gateway ID to be added on route table"
-  default = ""
+  default     = ""
 }
 
 variable "network-interface-id" {
-  type = "string"
+  type        = "string"
   description = "Network interface to be added on route"
-  default = ""
+  default     = ""
 }
 
 variable "instance-id" {
-  type = "string"
+  type        = "string"
   description = "Instance to be added on route"
-  default = ""
+  default     = ""
 }
 
 variable "gateway-id" {
-  type = "string"
+  type        = "string"
   description = "Internet Gateway to be added on route"
-  default = ""
+  default     = ""
 }
