@@ -14,7 +14,6 @@ terraform {
   required_version = "0.12.1"
 }
 
-
 # ---------------------------------------------------------------------------------------
 #
 # The cloud provider configuration. In this case we are using AWS. The default region
@@ -40,7 +39,7 @@ provider "aws" {
 
 resource "aws_key_pair" "key-pair" {
   key_name   = "simple-key-pair"
-  public_key = "${file("${path.cwd}/keypair")}"
+  public_key = file("${path.cwd}/keypair")
 }
 
 # ---------------------------------------------------------------------------------------
@@ -85,10 +84,11 @@ module "security-group-public" {
 
   name               = "simple-project-default"
   description        = "allow port 80"
-  vpc-id             = "${module.project-vpc.vpc-id}"
+  vpc-id             = module.project-vpc.vpc-id
   ingress-ports      = ["80", "443"]
   allowed-cidr-block = ["0.0.0.0/0"]
 }
+
 #---------------------------------------------------------------------------------------
 #
 # Instance cluster deployed in private subnet. It is also possible to create publicly
@@ -109,9 +109,9 @@ module "instance" {
 
   desired-instance   = 1
   project            = "simple-project"
-  subnet-ids         = "${module.project-vpc.public-subnet-ids}"
-  security-group-ids = ["${module.security-group-public.id}"]
-  key-pair           = "${aws_key_pair.key-pair.key_name}"
-  user-data          = "${file("${path.cwd}/modules/install_nginx/install")}"
+  subnet-ids         = module.project-vpc.public-subnet-ids
+  security-group-ids = [module.security-group-public.id]
+  key-pair           = aws_key_pair.key-pair.key_name
+  user-data          = file("${path.cwd}/modules/install_nginx/install")
 }
 

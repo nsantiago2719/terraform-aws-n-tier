@@ -1,25 +1,26 @@
 variable "domain" {
-  type        = "string"
+  type        = string
   description = "Domain name for the architecture"
 }
 
 variable "hosted-zone-name" {
-  type        = "string"
+  type        = string
   description = "Hosted zone name of the architecture"
 }
 
 variable "alternative-names" {
-  type        = "list"
+  type        = list(string)
   description = "list of alternative names for the certificate"
   default     = []
 }
 
 variable "elb-arn" {
-  type        = "string"
+  type        = string
   description = "Load balancer ARN for HTTPS listner"
 }
 
 variable "target-group-arn" {
-  type        = "string"
+  type        = string
   description = "Target group ARN declared on the load balancer"
 }
+

@@ -6,8 +6,7 @@ terraform {
 }
 
 resource "aws_vpc" "vpc" {
-
-  cidr_block = "${var.vpc-cidr-block}"
+  cidr_block = var.vpc-cidr-block
 
   tags = {
     Name = "vpc-${var.project}"
@@ -19,10 +18,10 @@ module "public_subnet" {
 
   project                    = "simple-project"
   name                       = "public-subnet"
-  vpc-id                     = "${aws_vpc.vpc.id}"
-  cidr-block                 = "${var.public-subnet-cidr}"
+  vpc-id                     = aws_vpc.vpc.id
+  cidr-block                 = var.public-subnet-cidr
   public                     = true
-  aws-default-route-table-id = "${aws_vpc.vpc.default_route_table_id}"
+  aws-default-route-table-id = aws_vpc.vpc.default_route_table_id
 }
 
 module "private_subnet" {
@@ -30,23 +29,23 @@ module "private_subnet" {
 
   project    = "simple-project"
   name       = "private-subnet"
-  vpc-id     = "${aws_vpc.vpc.id}"
-  cidr-block = "${var.private-subnet-cidr}"
+  vpc-id     = aws_vpc.vpc.id
+  cidr-block = var.private-subnet-cidr
   public     = false
 }
 
 module "nat-gateway" {
   source           = "./modules/nat"
-  public-subnet-id = "${element(module.public_subnet.subnet-ids, 0)}"
+  public-subnet-id = element(module.public_subnet.subnet-ids, 0)
 }
 
 module "route-table-associations-private" {
   source = "./modules/route-tables"
 
-  subnets        = "${module.private_subnet.subnet-ids}"
-  vpc-id         = "${aws_vpc.vpc.id}"
+  subnets        = module.private_subnet.subnet-ids
+  vpc-id         = aws_vpc.vpc.id
   project        = "simple-project"
   cidr-block     = "0.0.0.0/0"
-  nat-gateway-id = "${module.nat-gateway.id}"
+  nat-gateway-id = module.nat-gateway.id
 }
 

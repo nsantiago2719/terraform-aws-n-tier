@@ -30,7 +30,6 @@ provider "aws" {
   shared_credentials_file = "~/.aws/credentials"
 }
 
-
 # ---------------------------------------------------------------------------------------
 #
 # Key pairs uploaded in AWS and will be used by the instances for SSH connections
@@ -41,7 +40,7 @@ provider "aws" {
 
 resource "aws_key_pair" "key-pair" {
   key_name   = "simple-key-pair"
-  public_key = "${file("${path.cwd}/keypair")}"
+  public_key = file("${path.cwd}/keypair")
 }
 
 # ---------------------------------------------------------------------------------------
@@ -87,7 +86,7 @@ module "security-group-public" {
 
   name               = "simple-project-default"
   description        = "allow port 80"
-  vpc-id             = "${module.project-vpc.vpc-id}"
+  vpc-id             = module.project-vpc.vpc-id
   ingress-ports      = ["80", "443"]
   allowed-cidr-block = ["0.0.0.0/0"]
 }
@@ -97,9 +96,9 @@ module "security-group-instance" {
 
   name               = "simple-project-sg"
   description        = "allow port 80"
-  vpc-id             = "${module.project-vpc.vpc-id}"
+  vpc-id             = module.project-vpc.vpc-id
   ingress-ports      = ["80"]
-  security-group-ids = ["${module.security-group-public.id}"]
+  security-group-ids = [module.security-group-public.id]
 }
 
 # ---------------------------------------------------------------------------------------
@@ -122,10 +121,10 @@ module "instance-cluster-private" {
 
   desired-instance   = 3
   project            = "simple-project"
-  subnet-ids         = "${module.project-vpc.private-subnet-ids}"
-  security-group-ids = ["${module.security-group-instance.id}"]
-  key-pair           = "${aws_key_pair.key-pair.key_name}"
-  user-data          = "${file("${path.cwd}/modules/install_nginx/install")}"
+  subnet-ids         = module.project-vpc.private-subnet-ids
+  security-group-ids = [module.security-group-instance.id]
+  key-pair           = aws_key_pair.key-pair.key_name
+  user-data          = file("${path.cwd}/modules/install_nginx/install")
 }
 
 # ---------------------------------------------------------------------------------------
@@ -148,10 +147,10 @@ module "application-load-balancer" {
   source = "./modules/elb"
 
   name            = "simple-project-elb"
-  instance-ids    = "${module.instance-cluster-private.ids}"
-  subnets         = "${module.project-vpc.public-subnet-ids}"
-  security-groups = ["${module.security-group-public.id}"]
-  vpc-id          = "${module.project-vpc.vpc-id}"
+  instance-ids    = module.instance-cluster-private.ids
+  subnets         = module.project-vpc.public-subnet-ids
+  security-groups = [module.security-group-public.id]
+  vpc-id          = module.project-vpc.vpc-id
 }
 
 # ---------------------------------------------------------------------------------------
@@ -166,10 +165,10 @@ module "application-load-balancer" {
 module "subdomain-record" {
   source = "./modules/domain-routes"
 
-  subdomain        = "${var.sub-domain}"
-  hosted-zone-name = "${var.hosted-zone-name}"
-  lb-dns           = "${module.application-load-balancer.dns}"
-  lb-zone-id       = "${module.application-load-balancer.zone-id}"
+  subdomain        = var.sub-domain
+  hosted-zone-name = var.hosted-zone-name
+  lb-dns           = module.application-load-balancer.dns
+  lb-zone-id       = module.application-load-balancer.zone-id
 }
 
 # ---------------------------------------------------------------------------------------
@@ -187,10 +186,10 @@ module "subdomain-record" {
 module "https-connection" {
   source = "./modules/acm-ssl"
 
-  domain            = "${var.domain-name}"
-  hosted-zone-name  = "${var.hosted-zone-name}"
+  domain            = var.domain-name
+  hosted-zone-name  = var.hosted-zone-name
   alternative-names = ["*.${var.domain-name}"]
-  elb-arn           = "${module.application-load-balancer.arn}"
-  target-group-arn  = "${module.application-load-balancer.target-group-arn}"
+  elb-arn           = module.application-load-balancer.arn
+  target-group-arn  = module.application-load-balancer.target-group-arn
 }
 

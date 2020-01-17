@@ -6,8 +6,7 @@ terraform {
 }
 
 resource "aws_vpc" "vpc" {
-
-  cidr_block = "${var.vpc-cidr-block}"
+  cidr_block = var.vpc-cidr-block
 
   tags = {
     Name = "vpc-${var.project}"
@@ -19,9 +18,9 @@ module "public_subnet" {
 
   project                    = "simple-project"
   name                       = "public-subnet"
-  vpc-id                     = "${aws_vpc.vpc.id}"
-  cidr-block                 = "${var.public-subnet-cidr}"
+  vpc-id                     = aws_vpc.vpc.id
+  cidr-block                 = var.public-subnet-cidr
   public                     = true
-  aws-default-route-table-id = "${aws_vpc.vpc.default_route_table_id}"
+  aws-default-route-table-id = aws_vpc.vpc.default_route_table_id
 }
 
