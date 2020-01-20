@@ -14,13 +14,3 @@ variable "alternative-names" {
   default     = []
 }
 
-variable "elb-arn" {
-  type        = string
-  description = "Load balancer ARN for HTTPS listner"
-}
-
-variable "target-group-arn" {
-  type        = string
-  description = "Target group ARN declared on the load balancer"
-}
-

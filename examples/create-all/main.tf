@@ -11,7 +11,7 @@
 #
 # ---------------------------------------------------------------------------------------
 terraform {
-  required_version = "0.12.1"
+  required_version = "0.12.10"
 }
 
 # ---------------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ resource "aws_key_pair" "key-pair" {
 #
 # ---------------------------------------------------------------------------------------
 module "project-vpc" {
-  source = "./modules/vpc"
+  source = "../../modules/vpc"
 }
 
 # ---------------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ module "project-vpc" {
 #
 # ---------------------------------------------------------------------------------------
 module "security-group-public" {
-  source = "./modules/security-groups"
+  source = "../../modules/security-groups"
 
   name               = "simple-project-default"
   description        = "allow port 80"
@@ -92,7 +92,7 @@ module "security-group-public" {
 }
 
 module "security-group-instance" {
-  source = "./modules/security-groups"
+  source = "../../modules/security-groups"
 
   name               = "simple-project-sg"
   description        = "allow port 80"
@@ -117,7 +117,7 @@ module "security-group-instance" {
 #
 # ---------------------------------------------------------------------------------------
 module "instance-cluster-private" {
-  source = "./modules/ec2"
+  source = "../../modules/ec2"
 
   desired-instance   = 3
   project            = "simple-project"
@@ -144,13 +144,14 @@ module "instance-cluster-private" {
 # ---------------------------------------------------------------------------------------
 
 module "application-load-balancer" {
-  source = "./modules/elb"
+  source = "../../modules/elb"
 
   name            = "simple-project-elb"
   instance-ids    = module.instance-cluster-private.ids
   subnets         = module.project-vpc.public-subnet-ids
   security-groups = [module.security-group-public.id]
   vpc-id          = module.project-vpc.vpc-id
+  certificate-arn = module.https-connection.arn
 }
 
 # ---------------------------------------------------------------------------------------
@@ -163,7 +164,7 @@ module "application-load-balancer" {
 # lb-zone-id       = Hosted zone used by the load balancer. Required
 # ---------------------------------------------------------------------------------------
 module "subdomain-record" {
-  source = "./modules/domain-routes"
+  source = "../../modules/domain-routes"
 
   subdomain        = var.sub-domain
   hosted-zone-name = var.hosted-zone-name
@@ -184,12 +185,10 @@ module "subdomain-record" {
 # target-group-arn  = Target group arn for the listener
 # ---------------------------------------------------------------------------------------
 module "https-connection" {
-  source = "./modules/acm-ssl"
+  source = "../../modules/acm-ssl"
 
   domain            = var.domain-name
   hosted-zone-name  = var.hosted-zone-name
   alternative-names = ["*.${var.domain-name}"]
-  elb-arn           = module.application-load-balancer.arn
-  target-group-arn  = module.application-load-balancer.target-group-arn
 }
 

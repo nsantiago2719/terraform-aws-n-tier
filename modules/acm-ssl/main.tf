@@ -29,18 +29,4 @@ resource "aws_acm_certificate_validation" "cert-verification" {
   validation_record_fqdns = [aws_route53_record.cert_validation.fqdn]
 }
 
-resource "aws_lb_listener" "listener" {
-  count             = var.elb-arn ? 1 : 0
-  load_balancer_arn = var.elb-arn
-
-  port            = 443
-  protocol        = "HTTPS"
-  ssl_policy      = "ELBSecurityPolicy-2016-08"
-  certificate_arn = aws_acm_certificate.cert.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = var.target-group-arn
-  }
-}
 

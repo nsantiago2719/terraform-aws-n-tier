@@ -152,6 +152,7 @@ module "application-load-balancer" {
   subnets         = module.project-vpc.public-subnet-ids
   security-groups = [module.security-group-public.id]
   vpc-id          = module.project-vpc.vpc-id
+  certificate-arn = module.https-connection.arn
 }
 
 # ---------------------------------------------------------------------------------------
@@ -190,7 +191,5 @@ module "https-connection" {
   domain            = var.domain-name
   hosted-zone-name  = var.hosted-zone-name
   alternative-names = ["*.${var.domain-name}"]
-  elb-arn           = module.application-load-balancer.arn
-  target-group-arn  = module.application-load-balancer.target-group-arn
 }
 
